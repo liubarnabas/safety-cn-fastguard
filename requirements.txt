@@ -1,0 +1,7 @@
+  datasets==2.21.0
+  accelerate==0.34.2
+  evaluate==0.4.2
+  torch>=2.2
+  fastapi==0.112.0
+  uvicorn[standard]==0.30.6
+  onnxruntime>=1.18.1

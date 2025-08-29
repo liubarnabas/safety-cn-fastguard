@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: cn-fastguard }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: cn-fastguard } }
+  template:
+    metadata: { labels: { app: cn-fastguard } }
+    spec:
+      containers:
+      - name: api
+        image: yourrepo/cn-fastguard:latest
+        ports: [{containerPort: 8000}]
+        resources:
+          requests: { cpu: "500m", memory: "1Gi" }
+          limits: { cpu: "2", memory: "6Gi" }
+        env:
+          - name: TRANSFORMERS_NO_ADVISORY_WARNINGS
+            value: "1"
+          - name: OMP_NUM_THREADS
+            value: "2"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: cn-fastguard-hpa }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: cn-fastguard }
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }
