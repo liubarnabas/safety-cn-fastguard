@@ -1,0 +1,6 @@
+// src/inference/thresholds.json
+{
+  "roberta":   { "theta": 0.31, "temperature": 1.8211 },
+  "macbert":   { "theta": 0.34, "temperature": 1.7703 },
+  "deberta_zh":{ "theta": 0.15, "temperature": 0.9443 }
+}
