@@ -6,8 +6,15 @@
 - COLD
 - ToxiCN
 - SWSR
-- ChineseSafe（多候选 HF 仓已在 fetch_chinesesafe 中处理）
-- 本地 raw/xiaopen.csv
+- ChineseSafe（2024）
+- CHSD（Chinese Hate Speech Detection）
+- TOCP（Chinese Profanity）
+- Cyberbullying-Post-Role（Weibo）
+- ToxiCloakCN（带扰动鲁棒评测语料）
+- PKU-SafeRLHF-QA（含 is_safe）
+- BeaverTails（有害类别提示集合）
+- CDNA（Chinese Do-Not-Answer）
+- 本地 raw/xiaopen.csv（可选）
 
 功能要点：
 1) 统一字段：text_in / text_out / labels / task
@@ -29,6 +36,15 @@ from fetch_toxicn import load_toxicn
 from fetch_swsr import load_swsr
 from fetch_chinesesafe import load_chinesesafe
 from fetch_xiaopen import load_xiaopen
+
+# 新增数据源
+from fetch_chsd import load_chsd
+from fetch_tocp import load_tocp
+from fetch_cyberbully_weibo import load_cyberbully_weibo
+from fetch_toxicloakcn import load_toxicloakcn
+from fetch_pku_saferlhf_qa import load_pku_saferlhf_qa
+from fetch_beavertails import load_beavertails
+from fetch_cdna import load_cdna
 
 
 # ------------------------------
@@ -143,7 +159,7 @@ def _source_stats(sources: List[Tuple[str, Dataset]]) -> str:
     lines = []
     for name, ds in sources:
         n = len(ds) if ds is not None else 0
-        lines.append(f"- {name:<16}: {n:>7d}")
+        lines.append(f"- {name:<24}: {n:>7d}")
     return "\n".join(lines)
 
 def _binary_stats(ds: Dataset) -> str:
@@ -167,12 +183,19 @@ def build(
 
     # 1) 载入各源（原始 -> 二分类）
     src_raw = [
-        ("polyguardmix_zh", load_polyguardmix_zh()),
-        ("cold",            load_cold()),
-        ("toxicn",          load_toxicn()),
-        ("swsr",            load_swsr()),
-        ("chinesesafe",     load_chinesesafe()),
-#        ("xiaopen_local",   load_xiaopen()),
+        ("polyguardmix_zh",         load_polyguardmix_zh()),
+        ("cold",                    load_cold()),
+        ("toxicn",                  load_toxicn()),
+        ("swsr",                    load_swsr()),
+        ("chinesesafe",             load_chinesesafe()),
+        ("chsd",                    load_chsd()),
+        ("tocp",                    load_tocp()),
+        ("cyberbully_weibo",        load_cyberbully_weibo()),
+        ("toxicloakcn",             load_toxicloakcn()),
+        ("pku_saferlhf_qa",         load_pku_saferlhf_qa()),
+        ("beavertails",             load_beavertails()),
+        ("cdna",                    load_cdna()),
+        ("xiaopen_local",            load_xiaopen()),
     ]
     src_bin = [(name, _to_binary(ds)) for name, ds in src_raw]
 
@@ -204,12 +227,19 @@ def main():
     if not args.no_stats:
         # 再次加载二分类版源统计
         src_bin = [
-            ("polyguardmix_zh", _to_binary(load_polyguardmix_zh())),
-            ("cold",            _to_binary(load_cold())),
-            ("toxicn",          _to_binary(load_toxicn())),
-            ("swsr",            _to_binary(load_swsr())),
-            ("chinesesafe",     _to_binary(load_chinesesafe())),
-            ("xiaopen_local",   _to_binary(load_xiaopen())),
+            ("polyguardmix_zh",   _to_binary(load_polyguardmix_zh())),
+            ("cold",              _to_binary(load_cold())),
+            ("toxicn",            _to_binary(load_toxicn())),
+            ("swsr",              _to_binary(load_swsr())),
+            ("chinesesafe",       _to_binary(load_chinesesafe())),
+            ("chsd",              _to_binary(load_chsd())),
+            ("tocp",              _to_binary(load_tocp())),
+            ("cyberbully_weibo",  _to_binary(load_cyberbully_weibo())),
+            ("toxicloakcn",       _to_binary(load_toxicloakcn())),
+            ("pku_saferlhf_qa",   _to_binary(load_pku_saferlhf_qa())),
+            ("beavertails",       _to_binary(load_beavertails())),
+            ("cdna",              _to_binary(load_cdna())),
+            ("xiaopen_local",     _to_binary(load_xiaopen())),
         ]
         print("[Per-source rows after binarization]")
         print(_source_stats(src_bin))
